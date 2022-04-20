@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import Entypo from 'react-native-vector-icons/Entypo';
 import {useIsFocused} from '@react-navigation/native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
@@ -50,19 +49,6 @@ export default function Services() {
       setLoading(false);
     })
   };
-
-  // const getServices = () => {
-  //   axios
-  //     .get(`${API}/service`)
-  //     .then(resp => {
-  //       setServiceData(resp.data);
-  //       setLoading(false);
-  //     })
-  //     .catch(err => {
-  //       console.log('server error: ', err);
-  //       setLoading(false);
-  //     });
-  // };
 
   return (
     <View style={styles.container}>
@@ -106,7 +92,6 @@ export default function Services() {
                       activeOpacity={0.7}
                       style={{borderBottomWidth: 1}}
                       onPress={()=>navigation.navigate("editService",item)}
-                      // disabled={true}
                     >
                       <View style={styles.subView}>
                         <View style={{alignItems: 'center', flexDirection: 'row'}}>

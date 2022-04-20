@@ -20,8 +20,7 @@ import PushNotification from "react-native-push-notification";
 
 import SearchHeader from "./utils/searchHeader";
 import { API, API_USER, API_VENDOR } from "../../../../config";
-import VendorsNearby from "./utils/VendorsNearby";
-import { StackActions } from "@react-navigation/native";
+
 
 
 
@@ -35,7 +34,6 @@ export default function SearchScreen({navigation}){
     const [indicator4, setIndicator4] = useState(false);
     const [success, setSuccess] = useState(false);
     const [text, setText] = useState("");
-    const [filterData, setFilterData] = useState([]);
     const [location, setLocation] = useState({});
     const [isVisible, setIsVisible] = useState(false);
     const [title, setTitle] = useState("");
@@ -138,6 +136,7 @@ export default function SearchScreen({navigation}){
                         return(
                             <TouchableOpacity 
                                 style={styles.cat} key={item._id}
+                                activeOpacity={0.8}
                                 onPress={()=>navigation.navigate("ProductDetails",item)}
                             >
                                 <View style={styles.subView}>
@@ -160,12 +159,17 @@ export default function SearchScreen({navigation}){
             filterCatData.length === 0 ? 
             <Text style={{color:"gray",fontWeight:"500",textAlign:"center"}}>No Product found</Text>
             :
-            <View style={styles.boxContainer}>
+            <ScrollView
+                horizontal={true}
+                contentContainerStyle={{paddingRight:300}}
+                showsHorizontalScrollIndicator={false}
+            >
             {
                 filterCatData.map(item=>(
                     <TouchableOpacity
-                        style={styles.cat} 
+                        style={[styles.cat,{minWidth:"48%",marginRight:10}]} 
                         key={item._id}
+                        activeOpacity={0.8}
                         onPress={()=>navigation.navigate("Categories",{"title": item.name,"id": item._id})}
                     >
                         <View style={styles.subView}>
@@ -180,7 +184,7 @@ export default function SearchScreen({navigation}){
                     </TouchableOpacity>
                 ))
             }
-            </View>
+            </ScrollView>
         }
         </>
     );
@@ -195,6 +199,7 @@ export default function SearchScreen({navigation}){
                 filterServiceData.map(item=>(
                     <TouchableOpacity 
                         style={styles.cat} key={item._id}
+                        activeOpacity={0.8}
                         onPress={()=>navigation.navigate("ServiceDetails",item)}
                     >
                         <View style={styles.subView}>
@@ -255,7 +260,6 @@ export default function SearchScreen({navigation}){
             message: `You Have A Product Request of - ${title}`,
             bigText: `You Have A Product Request of - ${title}. ${description}`
         })
-        // PushNotification.getDeliveredNotifications((item)=>console.log(item));
     };
 
     const sendRequest=async()=>{
@@ -385,9 +389,7 @@ export default function SearchScreen({navigation}){
         >
             <SearchHeader
                 nav={()=>navigation.navigate("Alert")}
-                city={location.city}
-                state={location.state}
-                country={location.country}
+                LOCATION={location.location}
                 U_NAME={userData.name}
                 expand={isExpand}
                 SET_Expand={()=>setIsExpand(expand => !expand)}
@@ -422,6 +424,7 @@ export default function SearchScreen({navigation}){
                             paddingVertical:3,
                             borderRadius:5
                         }}
+                        activeOpacity={0.8}
                         onPress={toggle}
                     >
                         <Text style={{
@@ -532,6 +535,7 @@ export default function SearchScreen({navigation}){
                                 paddingHorizontal:10,
                                 borderRadius:5
                             }}
+                            activeOpacity={0.8}
                             onPress={sendRequest}
                         >
                             <Text style={{color:"#fff",fontWeight:"500"}}>Send Request</Text>

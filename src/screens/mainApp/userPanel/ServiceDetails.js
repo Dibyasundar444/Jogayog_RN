@@ -251,6 +251,12 @@ export default function ServiceDetails({route, navigation}) {
               <View style={styles.titleView}>
                 <Text style={styles.title}>{preData.title}</Text>
                 {
+                  preData.price !== 0 ?
+                  <Text style={{color:"gray",fontSize:13,fontWeight:"600"}}>₹ {preData.price}/-</Text>
+                  :
+                  null
+                }
+                {
                   preData.availstatus === true ? 
                   <Text style={{color: 'green', fontSize: 10,marginRight:10}}>Available</Text>
                   :

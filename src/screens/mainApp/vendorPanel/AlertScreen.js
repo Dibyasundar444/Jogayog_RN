@@ -6,14 +6,18 @@ import {
     ScrollView,
     Dimensions, 
     Image,
-    ActivityIndicator
+    ActivityIndicator,
+    TouchableOpacity,
+    Linking,
+    Platform
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from '@react-navigation/native';
 import Header from "./utils/header";
 import axios from "axios";
-import { API_VENDOR } from "../../../../config";
+import { API, API_VENDOR } from "../../../../config";
 
 
 export const { height, width } = Dimensions.get("window");
@@ -23,9 +27,9 @@ export default function AlertScreen({navigation}){
     const [indicator, setIndicator] = useState(false);
     const [data, setData] = useState([]);
     const [productReq, setProductReq] = useState([]);
+    const [index, setIndex] = useState("0");
 
     const isFocused = useIsFocused();
-    console.log(productReq);
     
 
     useEffect(()=>{
@@ -36,9 +40,13 @@ export default function AlertScreen({navigation}){
     },[isFocused]);
 
     const getProductReq=async()=>{
-        const dataObj = await AsyncStorage.getItem("PRODUCT_REQ");
-        const dataJSON = JSON.parse(dataObj);
-        dataJSON ? setProductReq(dataJSON) : setProductReq([]);
+        axios.get(`${API}/customorder`)
+        .then(res=>{
+            res.data.length > 0 ? setProductReq(res.data) : setProductReq([]);
+        })
+        .catch(err=>{
+            console.log(err);
+        })
     };
 
     const getVendor=async()=>{
@@ -52,11 +60,11 @@ export default function AlertScreen({navigation}){
         };
         axios.get(`${API_VENDOR}/vendordetail`,axiosConfig)
         .then(async res=>{
-            console.log(res.data.reviews);
+            // console.log(res.data.reviews);
             setData(res.data.reviews);
             let tempDate = new Date(res.data.createdAt);
             let year = tempDate.getFullYear();
-            let month = ('0' + (tempDate.getMonth()+1)).slice(-2);     // to get 0 before a single month (i.e 1 -> 01)
+            let month = ('0' + (tempDate.getMonth()+1)).slice(-2);      // to get 0 before a single month (i.e 1 -> 01)
             let day = ('0' + tempDate.getDate()).slice(-2);             // to get 0 before a single day   (i.e 3 -> 03)
             let fDate = `${day}-${month}-${year}`;
             global.fDate = fDate;
@@ -85,12 +93,125 @@ export default function AlertScreen({navigation}){
         }
         return arr;
     };
+
+    const openDialer = (item) => {
+        let number = item.customerId.phoneNo;
+        if (Platform.OS === 'ios') {
+          number = `telprompt:${number}`;
+        } else number = `tel:${number}`;
+        Linking.openURL(number);
+      };
+
+    const Rating=()=>(
+        data.map(item=>(
+            <View key={item._id} style={styles.mainView}>
+                <View style={styles.subView}>
+                    {
+                        item.user.profileImg ? 
+                        <Image style={styles.bgCircle} source={{uri:item.user.profileImg}} />
+                        :
+                        <View style={styles.bgCircle} />
+                    }                        
+                    <View style={styles.texts}>
+                        {
+                            item.user.name ? 
+                            <Text style={styles.name}>{item.user.name}</Text>
+                            :
+                            <Text style={styles.name}>{item.user._id.split('',6)}***</Text>
+                        }
+                        <View style={{flexDirection:"row",alignItems:"center",top:2}}>
+                            <Text style={styles.msg}>Service Rating {item.rating}/5</Text>
+                            {
+                                rating_given(item.rating)
+                            }
+                            {
+                                rating_remain(item.rating)
+                            }
+                        </View>
+                    </View>
+                    <View style={styles.time}>
+                        <Text 
+                            style={styles.timetxt}
+                        >
+                            {`${new Date(item.user.createdAt).getFullYear()}-${('0' + (new Date(item.user.createdAt).getMonth()+1)).slice(-2)}-${('0' + (new Date(item.user.createdAt).getDate()+1)).slice(-2)}`}
+                        </Text>
+                    </View>
+                </View>
+            </View>
+        ))
+    );
+    const Requests=()=>(
+        productReq.map(item=>(
+            <View key={item._id} style={styles.mainView}>
+                <View 
+                    style={{
+                        flexDirection:"row",
+                        alignItems:"flex-start",
+                        marginRight:20,
+                        marginVertical:10
+                    }}
+                >
+                    <View style={{alignItems:"center"}}>
+                        {
+                            item.customerId.profileImg ? 
+                            <Image style={styles.bgCircle} source={{uri:item.customerId.profileImg}} />
+                            :
+                            <View style={styles.bgCircle} />
+                        }
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            style={{
+                                alignItems:"center",
+                                justifyContent:"center",
+                                backgroundColor:"#d95448",
+                                height:25,
+                                width:25,
+                                borderRadius:12.5,
+                                elevation:5,
+                                marginTop:5
+                            }}
+                            onPress={()=>openDialer(item)}
+                        >
+                            <Ionicons name="call" color="#fff" size={14} />
+                        </TouchableOpacity>    
+                    </View>                        
+                    <View style={styles.texts}>
+                        {
+                            item.customerId.name ? 
+                            <Text style={{color:"#000",fontSize:12,fontWeight:"500"}}>{item.customerId.name}</Text>
+                            :
+                            <Text style={{color:"#000",fontSize:12,fontWeight:"500"}}>{item.customerId._id.split('',6)}***</Text>
+                        }
+                        <View style={{flexDirection:"row",alignItems:"center",flexWrap:"wrap"}}>
+                            <Text style={{color:"#000",fontSize:12,fontWeight:"500"}}>Requested for - </Text>
+                            <Text style={{color:"#d95448",fontSize:12,fontWeight:"500"}}>{item.title}</Text>
+                        </View>
+                        <View style={{flexDirection:"row",alignItems:"center",flexWrap:"wrap"}}>
+                            <Text style={{color:"#000",fontSize:12,fontWeight:"500"}}>Category - </Text>
+                            <Text style={{color:"#d95448",fontSize:12,fontWeight:"500"}}>{item.categoryId.name}</Text>
+                        </View>
+                        <View style={{flexDirection:"row",alignItems:"center",flexWrap:"wrap"}}>
+                            <Text style={{color:"#000",fontSize:12,fontWeight:"500"}}>Description - </Text>
+                            <Text style={{color:"gray",fontSize:12,fontWeight:"500"}}>{item.description}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.time}>
+                        <Text 
+                            style={{color:"#000",fontSize:10}}
+                        >
+                            {`${new Date(item.createdAt).getFullYear()}-${('0' + (new Date(item.createdAt).getMonth()+1)).slice(-2)}-${('0' + (new Date(item.createdAt).getDate()+1)).slice(-2)}`}
+                        </Text>
+                    </View>
+                </View>
+            </View>
+        ))
+    );
    
 
     return(
         <View style={styles.container}>
             <Header
-                title={`Alerts(${data.length+productReq.length})`}
+                title={`Alerts(${index =="0" ? data.length : productReq.length})`}
                 activeStyle={styles.bell}
                 bellColor="#fff"
                 profile={()=>navigation.navigate("ProfileScreen")}
@@ -103,102 +224,52 @@ export default function AlertScreen({navigation}){
                     {
                         indicator ? <ActivityIndicator size={30} style={{marginTop:50}} />
                         :
-                        data.length === 0 && productReq.length === 0 ? 
-                        <Text style={{color:"gray",fontWeight:"600",textAlign:"center",marginTop:30}}>You Have No Alert</Text>
-                        :
                         <>
-                            <View style={{alignItems:"center"}}>
-                                <Text style={{color:"gray",fontWeight:"600",marginVertical:5}}>Product Requests</Text>
-                                <View style={{borderWidth:0.5,width:"50%",marginBottom:5}} />
-                            </View>
-                            {
-                                productReq.length === 0 ?
-                                <Text style={{color:"#aaa",textAlign:"center",fontWeight:"500",marginVertical:50}}>No Request</Text>
-                                :
-                                productReq.map((item,index)=>(
-                                    <View 
-                                        key={index}
-                                        style={{marginLeft:20,borderBottomWidth:0.3}}
-                                    >
-                                        <View style={{marginVertical:5}}>
-                                            <View
-                                                style={{
-                                                    flexDirection:"row",
-                                                    alignItems:"flex-end"
-                                                }}
-                                            >
-                                                <Text style={{color:"#000",fontWeight:"500",fontSize:13}}>Requested Category: </Text>
-                                                <Text style={{color:"gray",textTransform:"capitalize",fontWeight:"500",fontSize:13}}>{item.category}</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    flexDirection:"row",
-                                                    alignItems:"flex-end"
-                                                }}
-                                            >
-                                                <Text style={{color:"#000",fontWeight:"500",fontSize:13}}>Requested Product: </Text>
-                                                <Text style={{color:"gray",textTransform:"capitalize",fontWeight:"500",fontSize:13}}>{item.title}</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    flexDirection:"row",
-                                                    alignItems:"flex-end",
-                                                    flexWrap:"wrap"
-                                                }}
-                                            >
-                                                <Text style={{color:"#000",fontWeight:"500",fontSize:13}}>Description: </Text>
-                                                <Text style={{color:"#000",fontSize:12}}>{item.description}</Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                ))
-                            }
-                            <View style={{alignItems:"center"}}>
-                                <Text style={{color:"gray",fontWeight:"600",marginVertical:5}}>Ratings</Text>
-                                <View style={{borderWidth:0.5,width:"50%",marginBottom:5}} />
-                            </View>
-                            {
-                                data.length === 0 ?
-                                <Text style={{color:"#aaa",textAlign:"center",fontWeight:"500",marginTop:50}}>No Rating</Text>
-                                :
-                                data.map(item=>(
-                                    <View key={item._id} style={styles.mainView}>
-                                        <View style={styles.subView}>
-                                            {
-                                                item.user.profileImg ? 
-                                                <Image style={styles.bgCircle} source={{uri:item.user.profileImg}} />
-                                                :
-                                                <View style={styles.bgCircle} />
-                                            }                        
-                                            <View style={styles.texts}>
-                                                {
-                                                    item.user.name ? 
-                                                    <Text style={styles.name}>{item.user.name}</Text>
-                                                    :
-                                                    <Text style={styles.name}>{item.user._id.split('',6)}***</Text>
-                                                }
-                                                <View style={{flexDirection:"row",alignItems:"center",top:2}}>
-                                                    <Text style={styles.msg}>Service Rating {item.rating}/5</Text>
-                                                    {
-                                                        rating_given(item.rating)
-                                                    }
-                                                    {
-                                                        rating_remain(item.rating)
-                                                    }
-                                                </View>
-                                            </View>
-                                            <View style={styles.time}>
-                                                <Text 
-                                                    style={styles.timetxt}
-                                                >
-                                                    {`${new Date(item.user.createdAt).getFullYear()}-${('0' + (new Date(item.user.createdAt).getMonth()+1)).slice(-2)}-${('0' + (new Date(item.user.createdAt).getDate()+1)).slice(-2)}`}
-                                                </Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                ))
-                            }
-                        </>
+                        <View style={{alignItems:"center",flexDirection:"row",alignSelf:"center",marginTop:5,marginBottom:10}}>
+                            <TouchableOpacity
+                                style={{
+                                    backgroundColor:index == "0" ? "#d95448" : "#fff",
+                                    alignItems:"center",
+                                    justifyContent:"center",
+                                    paddingHorizontal:10,
+                                    borderTopLeftRadius:5,
+                                    borderBottomLeftRadius:5,
+                                    elevation:5
+                                }}       
+                                activeOpacity={0.9}                      
+                                onPress={()=>setIndex("0")}
+                            >
+                                <Text style={{color:index == "0"?"#fff":"#000",fontWeight:"600",marginVertical:5}}>Rating</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={{
+                                    backgroundColor:index == "1" ? "#d95448" : "#fff",
+                                    alignItems:"center",
+                                    justifyContent:"center",
+                                    paddingHorizontal:10,
+                                    borderTopRightRadius:5,
+                                    borderBottomRightRadius:5,
+                                    elevation:5
+                                }}    
+                                activeOpacity={0.9}                        
+                                onPress={()=>setIndex("1")}
+                            >
+                                <Text style={{color:index == "1"?"#fff":"#000",fontWeight:"600",marginVertical:5}}>Request</Text>
+                            </TouchableOpacity>
+                        </View>
+                        {
+                            index == "0" ?
+                            data.length === 0 ?
+                            <Text style={{color:"#aaa",textAlign:"center",fontWeight:"500",marginTop:50}}>No Rating</Text>
+                            :
+                            <Rating />
+                            :
+                            productReq.length === 0 ?
+                            <Text style={{color:"#aaa",textAlign:"center",fontWeight:"500",marginTop:50}}>No Request</Text>
+                            :
+                            <Requests />
+                        }
+                        </>                            
                     }
                 </ScrollView>
             </View>
@@ -250,7 +321,7 @@ const styles = StyleSheet.create({
         marginTop: 5
     },
     texts: {
-        marginLeft: 10,
+        marginHorizontal: 10,
         // top: -10
     },
     time: {

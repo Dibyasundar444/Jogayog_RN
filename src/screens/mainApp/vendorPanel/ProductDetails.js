@@ -110,6 +110,12 @@ export default function ProductDetailsVendor({route, navigation}) {
           <View style={styles.titleView}>
             <Text style={styles.title}>{preData.item.title}</Text>
             {
+              preData.item.price ?
+              <Text style={{color:"gray",fontSize:13,fontWeight:"600"}}>₹ {preData.item.price}/-</Text>
+              :
+              null
+            }
+            {
               preData.item.availstatus === true ? 
               <Text style={{color: 'green', fontSize: 10,marginRight:10}}>Available</Text>
               :
@@ -117,9 +123,6 @@ export default function ProductDetailsVendor({route, navigation}) {
             }
           </View>
           <View style={{marginBottom: 20}}>
-            {/* <Text style={{color: '#000', fontSize: 13, marginVertical: 10}}>
-              {preData.content}
-            </Text> */}
             <Text style={{color: '#000', fontSize: 11, flexWrap: 'wrap'}}>
               {preData.item.description}
             </Text>

@@ -8,7 +8,6 @@ import {
   ScrollView,
   Button,
   ActivityIndicator,
-  Alert,
   Image
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';

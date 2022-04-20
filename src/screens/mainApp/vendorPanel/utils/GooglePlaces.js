@@ -3,7 +3,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { GOOGLE_MAPS_APIKEY } from '../../../../../config';
 
 
-export default function GooglePlaces({setLOCATION,setLAT_LONG,LOCATION,setPROGRESS,isPROGRESS}) {
+export default function GooglePlaces({setLOCATION,setLAT_LONG,LOCATION,setPROGRESS,isPROGRESS,preAddress}) {
 
 
   return (
@@ -11,7 +11,6 @@ export default function GooglePlaces({setLOCATION,setLAT_LONG,LOCATION,setPROGRE
         placeholder='Service location...'
         fetchDetails={true}
         onPress={(data, details = null) => {
-            console.log(data);
             setLOCATION(data.description);
             setLAT_LONG(details.geometry.location);
             if(isPROGRESS){

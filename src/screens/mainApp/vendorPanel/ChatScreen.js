@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import axios from "axios";
 import { useIsFocused } from "@react-navigation/native";
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import Header from "./utils/header";
 import { API_VENDOR } from "../../../../config";

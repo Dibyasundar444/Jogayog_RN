@@ -318,13 +318,18 @@ export default function ProductDetails({route, navigation}) {
               <View style={styles.titleView}>
                 <Text style={styles.title}>{preData.title}</Text>
                 {
+                  preData.price ?
+                  <Text style={{color:"gray",fontSize:13,fontWeight:"600"}}>₹ {preData.price}/-</Text>
+                  :
+                  null
+                }
+                {
                   preData.availstatus === true ? 
                   <Text style={{color: 'green', fontSize: 10,marginRight:10}}>Available</Text>
                   :
                   <Text style={{color: 'red', fontSize: 10}}>Not available</Text>
                 }
               </View>
-              {/* <Text style={{color: '#000', fontSize: 12}}>{preData.content}</Text> */}
               <View style={{marginBottom: 20}}>
                 <Text style={{color: '#000', fontSize: 13, marginVertical: 10}}>
                   {preData.description}

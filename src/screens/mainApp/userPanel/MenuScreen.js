@@ -51,11 +51,14 @@ export default function Menu({navigation}){
     const getBanner=()=>{
         axios.get(`${API}/banner`)
         .then(resp=>{
-            // console.log(resp.data);
             resp.data.map(item=>{
-                var innerObj = {img: item.imgUrl};
-                IMAGES.push(innerObj);
-                setBannerImg(IMAGES);
+                if(item.imgUrl){
+                    var innerObj = {img: item.imgUrl};
+                    IMAGES.push(innerObj);
+                    setBannerImg(IMAGES);
+                } else {
+
+                }
             });
         })
         .catch(err=>{
@@ -66,7 +69,6 @@ export default function Menu({navigation}){
     const getProducts=()=>{
         axios.get(`${API}/allproducts`)
         .then(resp=>{
-            // console.log(resp.data);
             setData(resp.data);
             setIndicator(false);
         })
@@ -79,7 +81,6 @@ export default function Menu({navigation}){
         axios.get(`${API}/service`)
         .then(resp => {
         setServiceData(resp.data);
-        console.log(resp.data);
         setIndicator1(false);
         })
         .catch(err => {
@@ -92,7 +93,7 @@ export default function Menu({navigation}){
         try{
             const JSON_OBJ = await AsyncStorage.getItem('location');
             const Parsed = JSON.parse(JSON_OBJ);
-            Parsed !== null ? setLocation(Parsed) : setLocation({});
+            Parsed !== null ? setLocation(Parsed) : setLocation("");
         }
         catch(err){
             console.log("err",err);
@@ -162,9 +163,7 @@ export default function Menu({navigation}){
         <View style={styles.container}>
             <MenuHeader 
                 alert={()=>navigation.navigate("Alert")}
-                city={location.city}
-                state={location.state}
-                country={location.country}
+                LOCATION={location.location}
                 U_NAME={userData.name}
                 expand={isExpand}
                 SET_Expand={()=>setIsExpand(expand => !expand)}

@@ -20,8 +20,6 @@ import { StackActions, useIsFocused } from "@react-navigation/native";
 import { BottomSheet } from "react-native-btr";
 import axios from "axios";
 
-
-
 import { API, API_VENDOR } from "../../../../config";
 import ProfileHeader from "./utils/profileHeader";
 import GooglePlaces from "./utils/GooglePlaces";
@@ -42,11 +40,8 @@ export default function ProfileScreen({navigation}){
     const [address, setAddress] = useState('');
     const [lat_long, setLat_long] = useState({});
     const [locationIndex, setLocationIndex] = useState('0');
-
-    
-    // const link = "link/will/be/here";
-    // console.log(address);
-    // console.log(lat_long);
+    const [preAddress, setPreAddress] = useState('');
+    const [preServicArea, setPreServiceArea] = useState(null);
 
     useEffect(()=>{
         if(isFocused){
@@ -105,12 +100,6 @@ export default function ProfileScreen({navigation}){
         .catch(err=>console.log(err))
     };
 
-    // let axiosConfig = {
-    //     headers: {
-    //         Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyYXRpbmdzIjozLCJudW1PZlJldmlld3MiOjMsInJvbGUiOjEsInN0YXR1cyI6ImFjdGl2ZSIsInByb2ZpbGVJbWciOiJodHRwczovL2ZpcmViYXNlc3RvcmFnZS5nb29nbGVhcGlzLmNvbS92MC9iL211bHRpdmVuZG9yLTVkMDI3LmFwcHNwb3QuY29tL28vVkVORE9SJTJGcHJvZmlsZV9pbWFnZSUyRnJuX2ltYWdlX3BpY2tlcl9saWJfdGVtcF9iZDNhNWM5Ny0wOWUxLTRkYjEtODlkNi05NzRlY2NkNTBlMDYuanBnP2FsdD1tZWRpYSZ0b2tlbj00Mzg5ZGRiOC05MGVkLTRiODYtOWE0Ny01Njc0YWM0MzRjZTkiLCJzZXJ2aWNlcyI6WyI2MjE2MzFiZTE5YTZjODAwMTY2ZjNlZDEiLCI2MjFlZmZhNmIxYjNmMjAwMTY1ZGRiYjQiLCI2MjFmNWM1NjgxNzE4NjAwMTYzOWFkY2MiXSwiYWN0aXZlIjp0cnVlLCJjdXN0b21lcmNvbnRhY3QiOlsiNjIwZmFmOWJmNjA0ZDUwMDE2N2RlZjE2IiwiNjIxMDhmZWU5OTQyMGMwMDE2YzQ0Yjk2IiwiNjIxM2M5YWNkYTA2Y2IwMDE2Y2M3NTgyIiwiNjIxMTI2MGQ2Njg5YTIwMDE2ZGVlYTdlIl0sIl9pZCI6IjYyMGY5Y2ViYTQ0YzQ2MDAxNmU5YTNjZiIsInBob25lTm8iOjc0MDc2NjgwNDUsInJldmlld3MiOlt7Il9pZCI6IjYyMTA5MmJkOTk0MjBjMDAxNmM0NGJjMCIsInVzZXIiOiI2MjEwOGZlZTk5NDIwYzAwMTZjNDRiOTYiLCJyYXRpbmciOjN9LHsiX2lkIjoiNjIxNGE1NjEyY2E3ZDUwMDE2M2YxZDM5IiwidXNlciI6IjYyMGZhZjliZjYwNGQ1MDAxNjdkZWYxNiIsInJhdGluZyI6MX0seyJfaWQiOiI2MjFlZmY1Y2IxYjNmMjAwMTY1ZGRiN2UiLCJ1c2VyIjoiNjIxM2M5YWNkYTA2Y2IwMDE2Y2M3NTgyIiwicmF0aW5nIjo1fV0sImNyZWF0ZWRBdCI6IjIwMjItMDItMThUMTM6MTk6MzkuNzQ2WiIsInVwZGF0ZWRBdCI6IjIwMjItMDMtMDJUMTM6NTk6MTUuNDYxWiIsIl9fdiI6MywiY291bnRyeSI6IklOIiwibGF0aXR1ZGUiOiIyMS44MjY0MjE2IiwibG9jYWxpdHkiOiJCaXJiaGFkcmFwdXIiLCJsb25naXR1ZGUiOiI4Ny4yOTA1NzQ3Iiwic3RhdGUiOiJXZXN0IEJlbmdhbCIsIm5hbWUiOiJEaWJ5YXN1bmRhcl92ZW5kb3IiLCJlbWFpbCI6InB1cnBvc2V0ZXN0aW5nNTJAZ21haWwuY29tIiwiaWF0IjoxNjQ2Mjk2NjQxfQ.P93HYA1Rtt5Uj81NP1xBtvTFcUQKZ88Rn2UJyh20l4s"
-    //     }
-    // };
-
     const getVendor=async()=>{
         const json_Val = await AsyncStorage.getItem("jwt");
         const parsed = JSON.parse(json_Val);
@@ -124,6 +113,8 @@ export default function ProfileScreen({navigation}){
             setPhoneNo(res.data.phoneNo);
             setName(res.data.name);
             setImg(res.data.profileImg);
+            res.data.location ? setPreAddress(res.data.location) : setPreAddress("");
+            res.data.serviceArea ? setPreServiceArea(res.data.serviceArea) : setPreServiceArea(null);
         })
         .catch(err=>{
             console.log(err);
@@ -153,7 +144,7 @@ export default function ProfileScreen({navigation}){
         try{
             const JSON_OBJ = await AsyncStorage.getItem('location');
             const Parsed = JSON.parse(JSON_OBJ);
-            console.log(Parsed);
+            // console.log(Parsed);
             Parsed !== null ? setLocation(Parsed) : setLocation({});
         }
         catch(err){
@@ -192,9 +183,10 @@ export default function ProfileScreen({navigation}){
         };
         axios.patch(`${API_VENDOR}/updatevendor`,updateData,axiosConfig)
         .then(res=>{
-            console.log(res.data);
+            // console.log(res.data);
             setIndicator(false);
             setIsUpdated(true);
+            getVendor();
         })
         .catch(err=>{
             console.log(err);
@@ -277,18 +269,91 @@ export default function ProfileScreen({navigation}){
                     <Text 
                         style={{
                             color:"#000",
-                            fontWeight:"500",
+                            fontWeight:"700",
                             marginVertical:10
                         }}
                     >My Location</Text>
                     <View 
                         style={{
-                            width:"80%",
+                            width:"40%",
                             borderWidth: 0.5,
-                            marginBottom:5
+                            marginBottom:10
                         }} 
                     />
-                    
+                    {
+                        (preAddress ||preServicArea) &&
+                        <>
+                            <View 
+                                style={{
+                                    alignItems:"center",
+                                    borderWidth:0.2,
+                                    paddingHorizontal:20,
+                                    paddingVertical:20,
+                                    marginVertical:10,
+                                    borderRadius:5
+                                }}
+                            >
+                                {
+                                    preAddress &&
+                                    <>
+                                        <Text
+                                            style={{
+                                                color:"#000",
+                                                fontWeight:"600"
+                                            }}
+                                        >Current Service Location :
+                                        </Text>
+                                        <View>
+                                            <Text
+                                                style={{
+                                                    color:"gray",
+                                                    fontSize:13
+                                                }}
+                                            >{preAddress}</Text>
+                                        </View>
+                                    </>
+                                }
+                                {
+                                    preServicArea &&
+                                    <View style={{flexDirection:"row",alignItems:"flex-end",marginTop:5}}>
+                                        <Text
+                                            style={{
+                                                color:"#000",
+                                                fontWeight:"600"
+                                            }}
+                                        >Current Service Area :
+                                        </Text>
+                                        <View>
+                                            <Text
+                                                style={{
+                                                    color:"gray",
+                                                    fontSize:13,
+                                                    marginLeft:5
+                                                }}
+                                            >{preServicArea} km</Text>
+                                        </View>
+                                    </View>
+                                }
+                            </View>
+                            <View 
+                                style={{
+                                    width:"100%",
+                                    borderWidth:1,
+                                    borderColor:"#aaa",
+                                    marginVertical:10,
+                                    backgroundColor:"#aaa"
+                                }}
+                            />
+                            <Text style={{color:"#000",fontWeight:"700"}}>Update Service Location</Text>
+                            <View 
+                                style={{
+                                    width:"60%",
+                                    borderWidth: 0.5,
+                                    marginVertical:10
+                                }} 
+                            />
+                        </>
+                    }
                     <View style={{right:-10}}>
                         <TouchableOpacity
                             style={{
@@ -393,7 +458,7 @@ export default function ProfileScreen({navigation}){
                     }
                 </View>
                 :
-                <View style={[styles.card,{height:"80%"}]}>
+                <View style={[styles.card,{height: "85%"}]}>
                     <View
                         style={{
                             position:"absolute",
@@ -463,7 +528,7 @@ export default function ProfileScreen({navigation}){
                             fontSize:12,
                             marginHorizontal:20,
                             textAlign:"center",
-                            marginVertical:20
+                            marginVertical:15
                         }}
                     >
                         service area will be calculated from above location
@@ -479,7 +544,7 @@ export default function ProfileScreen({navigation}){
                             flexDirection:"row",
                             alignItems:"center",
                             marginHorizontal:40,
-                            marginVertical:20
+                            marginBottom:15
                         }}
                         >
                             <TouchableOpacity

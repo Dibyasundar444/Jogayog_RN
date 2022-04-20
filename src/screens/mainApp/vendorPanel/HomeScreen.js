@@ -8,18 +8,14 @@ import {
   Linking,
   Dimensions,
   Image,
-  TextInput,
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
-import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {StackActions, useIsFocused} from '@react-navigation/native';
-import {launchImageLibrary} from 'react-native-image-picker';
-import storage from '@react-native-firebase/storage';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 

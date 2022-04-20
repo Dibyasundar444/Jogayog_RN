@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     },
     previewImageStyle: {
         width: width, 
-        resizeMode: 'cover', 
+        resizeMode: 'contain', 
         height: 400
     }
 

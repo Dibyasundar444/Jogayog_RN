@@ -11,7 +11,7 @@ import EvilIcons from "react-native-vector-icons/EvilIcons";
 import Entypo from "react-native-vector-icons/Entypo";
 
 
-export default function SearchHeader({nav,city,state,country,U_NAME,expand,SET_Expand,isU_Name,ready}){
+export default function SearchHeader({nav,LOCATION,U_NAME,expand,SET_Expand,isU_Name,ready}){
 
     return(
         <View style={styles.header}>
@@ -29,7 +29,7 @@ export default function SearchHeader({nav,city,state,country,U_NAME,expand,SET_E
                     ? 
                     <View>
                         <Text style={styles.text1}>{U_NAME}</Text>
-                        <Text style={styles.text2}>{city}, {state} ({country})</Text>
+                        <Text style={styles.text2}>{LOCATION}</Text>
                     </View>
                     :
                     <View>
@@ -37,7 +37,7 @@ export default function SearchHeader({nav,city,state,country,U_NAME,expand,SET_E
                             isU_Name ? 
                             <Text style={styles.text3}>{U_NAME}</Text>
                             :
-                            <Text style={styles.text4}>{city}, {state} ({country})</Text>
+                            <Text style={styles.text4}>{LOCATION}</Text>
                         }
                     </View>
                 }
