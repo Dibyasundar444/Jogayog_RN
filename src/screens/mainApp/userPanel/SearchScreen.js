@@ -161,13 +161,22 @@ export default function SearchScreen({navigation}){
             :
             <ScrollView
                 horizontal={true}
-                contentContainerStyle={{paddingRight:300}}
+                contentContainerStyle={{}}
                 showsHorizontalScrollIndicator={false}
             >
             {
                 filterCatData.map(item=>(
                     <TouchableOpacity
-                        style={[styles.cat,{minWidth:"48%",marginRight:10}]} 
+                        style={{
+                            height:40,
+                            paddingRight:10,
+                            // maxWidth:"48%",
+                            backgroundColor:"#fff",
+                            borderRadius:10,
+                            justifyContent:"center",
+                            marginBottom:10,
+                            marginRight:10
+                        }} 
                         key={item._id}
                         activeOpacity={0.8}
                         onPress={()=>navigation.navigate("Categories",{"title": item.name,"id": item._id})}
